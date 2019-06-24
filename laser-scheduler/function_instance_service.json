@@ -1,0 +1,20 @@
+{
+    "apiVersion": "v1",
+    "kind": "Service",
+    "metadata": {
+        "name": "app-{{instance_name}}"
+    },
+    "spec": {
+        "selector": {
+            "app": "app-{{instance_name}}"
+        },
+        "ports": [
+            {
+                "protocol": "TCP",
+                "port": 80,
+                "targetPort": 80
+            }
+        ]
+    }
+
+}

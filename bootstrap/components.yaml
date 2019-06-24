@@ -1,0 +1,94 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: laser
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: laserapp
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gateway
+  namespace: laser
+spec:
+  selector:
+    app: gateway
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+  type: NodePort
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: scheduler
+  namespace: laser
+spec:
+  selector:
+    app: scheduler
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: scheduler
+  namespace: laser
+  labels:
+    app: scheduler
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: scheduler
+  template:
+    metadata:
+      labels:
+        app: scheduler
+    spec:
+      containers:
+      - name: app
+        image: local.insecure-registry.io/laser-scheduler:latest
+        ports:
+        - containerPort: 80
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gateway
+  namespace: laser
+  labels:
+    app: gateway
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gateway
+  template:
+    metadata:
+      labels:
+        app: gateway
+    spec:
+      containers:
+      - name: app
+        image: local.insecure-registry.io/laser-gateway:latest
+        ports:
+        - containerPort: 80
+      - name: cache
+        image: redis:5.0.5
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: laser-ingress
+  namespace: laser
+spec:
+  backend:
+    serviceName: gateway
+    servicePort: 80

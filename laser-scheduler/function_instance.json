@@ -1,0 +1,91 @@
+{
+    "apiVersion": "apps/v1beta2",
+    "kind": "Deployment",
+    "metadata": {
+        "name": "app-{{instance_name}}",
+        "labels":{
+            "app": "app-{{instance_name}}"
+        }
+    },
+    "spec":{
+        "replicas": {{replicas}},
+        "selector":{
+            "matchLabels":{
+                "app": "app-{{instance_name}}"
+            }
+        },
+        "template":{
+            "metadata":{
+                "labels":{
+                    "app": "app-{{instance_name}}"
+                }
+            },
+            "spec":{
+                "volumes": [
+                    {
+                        "name": "function-dir",
+                        "emptyDir": {}
+                    }
+                ],
+                "initContainers": [
+                    {
+                        "name": "fetch",
+                        "image": "{{{runtime_image}}}",
+                        "command": ["sh", "/runtime/fetch_functions.sh"],
+                        "env": [
+                            {
+                                "name": "IMAGE_URL",
+                                "value": "{{{download_url}}}"
+                            }
+                        ],
+                        "volumeMounts": [
+                            {
+                                "name": "function-dir",
+                                "mountPath": "/mod"
+                            }
+                        ]
+                    
+                    }
+                ],
+                "containers": [
+                    {
+                        "name": "userapp",
+                        "image": "{{{runtime_image}}}",
+                        "command": ["node", "/runtime/index.js"],
+                        "volumeMounts": [
+                            {
+                                "name": "function-dir",
+                                "mountPath": "/mod"
+                            }
+                        ],
+                        "readinessProbe": {
+                            "exec": {
+                                "command": ["test", "-e", "/mod/user.sock"]
+                            },
+                            "initialDelaySeconds": 1,
+                            "periodSeconds": 1
+                        }
+                    },
+                    {
+                        "name": "sidecar",
+                        "image": "{{{sidecar_image}}}",
+                        "volumeMounts": [
+                            {
+                                "name": "function-dir",
+                                "mountPath": "/mod"
+                            }
+                        ],
+
+                        "ports": [
+                            {"containerPort": 80}
+                        ]
+                            
+                        
+                    }
+                ]
+            }
+        }
+
+    }
+
+}

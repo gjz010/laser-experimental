@@ -1,0 +1,323 @@
+{
+  "swagger" : "2.0",
+  "info" : {
+    "version" : "1.0.0",
+    "title" : "Laser Platform",
+    "description" : "The user-end API for using Laser, the function-as-a-service."
+  },
+  "securityDefinitions" : {
+    "application" : {
+      "type" : "oauth2",
+      "tokenUrl" : "http://example.com/oauth/token",
+      "flow" : "application",
+      "scopes" : {
+        "write" : "allows modifying resources",
+        "read" : "allows reading resources"
+      }
+    }
+  },
+  "security" : [ {
+    "application" : [ "read", "write" ]
+  } ],
+  "paths" : {
+    "/function_bundles" : {
+      "post" : {
+        "tags" : [ "Function Bundle" ],
+        "summary" : "Add a function bundle.",
+        "operationId" : "addFunctionBundle",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "bundle",
+          "schema" : {
+            "$ref" : "#/definitions/FunctionBundle"
+          }
+        } ],
+        "responses" : {
+          "201" : {
+            "description" : "Created.",
+            "schema" : {
+              "$ref" : "#/definitions/FunctionBundle"
+            }
+          },
+          "409" : {
+            "description" : "Conflict."
+          }
+        }
+      }
+    },
+    "/function_bundles/{bundle_id}" : {
+      "get" : {
+        "tags" : [ "Function Bundle" ],
+        "operationId" : "getFunctionBundle",
+        "summary" : "Get information about the function bundle.",
+        "description" : "Get information about the function bundle.",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "bundle_id",
+          "type" : "string",
+          "required" : true,
+          "description" : "The id of the function bundle."
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Ok.",
+            "schema" : {
+              "$ref" : "#/definitions/FunctionBundle"
+            }
+          },
+          "404" : {
+            "description" : "Not found."
+          }
+        }
+      },
+      "put" : {
+        "tags" : [ "Function Bundle" ],
+        "operationId" : "putFunctionBundle",
+        "summary" : "Modify the function bundle.",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "bundle_id",
+          "type" : "string",
+          "required" : true,
+          "description" : "The id of the function bundle."
+        }, {
+          "in" : "body",
+          "name" : "bundle",
+          "schema" : {
+            "$ref" : "#/definitions/FunctionBundle"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Ok.",
+            "schema" : {
+              "$ref" : "#/definitions/FunctionBundle"
+            }
+          },
+          "404" : {
+            "description" : "Not found."
+          }
+        }
+      },
+      "delete" : {
+        "tags" : [ "Function Bundle" ],
+        "operationId" : "deleteFunctionBundle",
+        "summary" : "Delete the bundle.",
+        "description" : "Delete the bundle.",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "bundle_id",
+          "type" : "string",
+          "required" : true,
+          "description" : "The id of the function bundle."
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "No content."
+          }
+        }
+      }
+    },
+    "/function_bundles/{bundle_id}/bundle" : {
+      "get" : {
+        "tags" : [ "Function Bundle" ],
+        "operationId" : "downloadFunctionBundle",
+        "summary" : "Get the download link for the function bundle.",
+        "description" : "Get the download link about the function bundle.",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "bundle_id",
+          "type" : "string",
+          "required" : true,
+          "description" : "The id of the function bundle."
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Ok.",
+            "schema" : {
+              "type" : "object",
+              "properties" : {
+                "upload_url" : {
+                  "type" : "string",
+                  "example" : "https://s3.laser.gjz010.com/my_function",
+                  "description" : "The download url"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Not found."
+          }
+        }
+      },
+      "put" : {
+        "tags" : [ "Function Bundle" ],
+        "operationId" : "uploadFunctionBundle",
+        "summary" : "Get the upload link for the function bundle.",
+        "description" : "Get the upload link about the function bundle.",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "bundle_id",
+          "type" : "string",
+          "required" : true,
+          "description" : "The id of the function bundle."
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Ok.",
+            "schema" : {
+              "type" : "object",
+              "properties" : {
+                "upload_url" : {
+                  "type" : "string",
+                  "example" : "https://s3.laser.gjz010.com/my_function",
+                  "description" : "The upload url"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Not found."
+          }
+        }
+      }
+    },
+    "/function_bundles/{bundle_id}/instances" : {
+      "delete" : {
+        "tags" : [ "Function Bundle" ],
+        "operationId" : "flushFunctionBundleInstances",
+        "summary" : "Flush all running instances of this function bundle.",
+        "description" : "Flush all running instances of this function bundle.",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "bundle_id",
+          "type" : "string",
+          "required" : true,
+          "description" : "The id of the function bundle."
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "No content."
+          },
+          "404" : {
+            "description" : "Not found."
+          }
+        }
+      }
+    },
+    "/apis" : {
+      "get" : {
+        "tags" : [ "API Definition" ],
+        "summary" : "Get all APIs visible.",
+        "operationId" : "getAPIs",
+        "responses" : {
+          "200" : {
+            "description" : "Ok.",
+            "schema" : {
+              "$ref" : "#/definitions/API"
+            }
+          }
+        }
+      },
+      "post" : {
+        "tags" : [ "API Definition" ],
+        "summary" : "Add an API definition.",
+        "operationId" : "createAPI",
+        "responses" : {
+          "201" : {
+            "description" : "Created."
+          },
+          "409" : {
+            "description" : "Conflict."
+          }
+        }
+      }
+    },
+    "/apis/{api_id}" : {
+      "get" : {
+        "tags" : [ "API Definition" ],
+        "summary" : "Get API by ID",
+        "operationId" : "getAPI",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "api_id",
+          "type" : "string",
+          "required" : true,
+          "description" : "The id of the api."
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Ok."
+          }
+        }
+      },
+      "put" : {
+        "tags" : [ "API Definition" ],
+        "summary" : "Modify API",
+        "operationId" : "modifyAPI",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "api_id",
+          "type" : "string",
+          "required" : true,
+          "description" : "The id of the api."
+        }, {
+          "in" : "body",
+          "name" : "api",
+          "schema" : {
+            "$ref" : "#/definitions/API"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Ok."
+          }
+        }
+      },
+      "delete" : {
+        "tags" : [ "API Definition" ],
+        "summary" : "Delete API by ID",
+        "operationId" : "deleteAPI",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "api_id",
+          "type" : "string",
+          "required" : true,
+          "description" : "The id of the api."
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "No content."
+          }
+        }
+      }
+    }
+  },
+  "definitions" : {
+    "FunctionBundle" : {
+      "properties" : {
+        "id" : {
+          "type" : "string"
+        },
+        "name" : {
+          "type" : "string"
+        }
+      },
+      "required" : [ "id", "name" ]
+    },
+    "API" : {
+      "properties" : {
+        "id" : {
+          "type" : "string"
+        },
+        "name" : {
+          "type" : "string"
+        }
+      },
+      "required" : [ "id", "name" ]
+    }
+  },
+  "host" : "virtserver.swaggerhub.com",
+  "basePath" : "/gjz0107/laser-platform/1.0.0",
+  "schemes" : [ "https" ]
+}
